@@ -15,7 +15,7 @@
             deleteLineBtnClass: "btn-phone-inputs-delete-line",
             checkboxInputSectionClass: "phone-inputs-default-checkbox-section",
             lineClass: 'phone-inputs-line',
-            required: 'false'
+            required: false
         }, options);
 
         var events = {

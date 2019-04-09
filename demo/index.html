@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.min.css">
+
+    <!-- Highlight -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/lightfair.min.css">
 </head>
 
 <body>
@@ -27,8 +30,8 @@
         <div class="py-3">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="lead font-weight-bold">Input example</div>
-                    <form id="phone-inputs-test-form" method="post">
+                    <div class="lead font-weight-bold">Example</div>
+                    <form id="phone-inputs-test-form" class="py-3" method="post">
                         <div class="phone-inputs"></div>
                         <br>
                         <button type="submit" class="btn btn-success">Submit</button>
@@ -36,7 +39,8 @@
 
                     <section class="mt-5 py-4 px-4 bg-light" id="debug-section">
                         <div class="lead mt-2">Debug console</div>
-                        <small class="mb-5">Listen to <b>phone.inputs.debug</b> event: <code>$('.phone-inputs').on('phone.inputs.debug', function(event, data){});</code></small>
+                        <small class="mb-5">Listen to <b>phone.inputs.debug</b> event:
+                            <code>$('.phone-inputs').on('phone.inputs.debug', function(event, data){});</code></small>
                         <hr>
                     </section>
                 </div>
@@ -47,6 +51,69 @@
                 </div>
             </div>
         </div>
+
+        <hr>
+
+        <div class="display-4">Documentation</div>
+        <div class="lead">Simplest integration</div>
+<br>
+        <div class="row">
+            <div class="col-md-12">
+                <h4>1- Phone number field template script</h4>
+                <small>Add the template in your page or your app layout</small>
+                <code>The current template is based on <a href="https://getbootstrap.com/docs/4.3/getting-started/introduction/">Boostrap 4.3</a></code>
+                <div class="my-3 px-1 py-1 bg-light">
+                    <pre>
+                        <code class="htmlbars">
+&#x3C;script type=&#x22;text/html&#x22; id=&#x22;phone-inputs-line-template&#x22;&#x3E;
+    &#x3C;div class=&#x22;row phone-inputs-line my-1&#x22;&#x3E;
+        &#x3C;div class=&#x22;col-sm-12&#x22;&#x3E;
+            &#x3C;div class=&#x22;input-group&#x22;&#x3E;
+                &#x3C;div class=&#x22;input-group-prepend&#x22;&#x3E;
+                    &#x3C;span class=&#x22;input-group-text&#x22;&#x3E;&#x3C;i class=&#x22;fas fa-phone&#x22;&#x3E;&#x3C;/i&#x3E;&#x3C;/span&#x3E;
+                &#x3C;/div&#x3E;
+                &#x3C;select class=&#x22;custom-select&#x22;&#x3E;&#x3C;/select&#x3E;
+                &#x3C;input type=&#x22;text&#x22; class=&#x22;form-control&#x22;&#x3E;
+                &#x3C;div class=&#x22;input-group-append&#x22;&#x3E;
+                    &#x3C;div class=&#x22;input-group-text phone-inputs-default-checkbox-section&#x22;&#x3E;&#x3C;input type=&#x22;checkbox&#x22;&#x3E;&#x3C;/div&#x3E;
+                    &#x3C;button type=&#x22;button&#x22; class=&#x22;btn btn-success btn-sm btn-phone-inputs-add-line&#x22;&#x3E;&#x3C;i
+                            class=&#x22;fa fa-plus&#x22;&#x3E;&#x3C;/i&#x3E;&#x3C;/button&#x3E;
+                    &#x3C;button type=&#x22;button&#x22; class=&#x22;btn btn-danger btn-sm btn-phone-inputs-delete-line&#x22;&#x3E;&#x3C;i
+                            class=&#x22;fa fa-trash&#x22;&#x3E;&#x3C;/i&#x3E;&#x3C;/button&#x3E;
+                &#x3C;/div&#x3E;
+            &#x3C;/div&#x3E;
+        &#x3C;/div&#x3E;
+    &#x3C;/div&#x3E;
+&#x3C;/script&#x3E;
+                        </code>
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4>2- Initialization example</h4>
+                <div class="my-3 px-3 py-3 bg-light">
+                    <pre class="font-weight-light">
+                        <code class="javascript">
+                            $('.phone-inputs').phoneInputs({
+                                'countriesUrl': 'https://restcountries.eu/rest/v2/all',
+                                'multiple': true,
+                                'countryCodeAttr': 'alpha2Code',
+                                'countryNameAttr': 'name',
+                                'countryCallPrefix': 'callingCodes',
+                                'limit': 5,
+                                'lineTemplate': '#phone-inputs-line-template',
+                                'inputName': 'phone',
+                                'required': true
+                            });
+                        </code>
+                    </pre>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script type="text/html" id="phone-inputs-line-template">
@@ -57,7 +124,7 @@
                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
                     </div>
                     <select class="custom-select"></select>
-                    <input type="text" aria-label="First name" class="form-control">
+                    <input type="text" class="form-control">
                     <div class="input-group-append">
                         <div class="input-group-text phone-inputs-default-checkbox-section"><input type="checkbox"></div>
                         <button type="button" class="btn btn-success btn-sm btn-phone-inputs-add-line"><i
@@ -70,56 +137,28 @@
         </div>
     </script>
 
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+    <!-- Boostrap -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+
+    <!-- Display JSON -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.js"></script>
+    
+    <!-- Highlight -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/languages/htmlbars.min.js"></script>
+    
+    <!-- jQuery Phone Inputs -->
     <script src="../dist/jquery.phone.inputs.js"></script>
 
-    <script>
-        $('.phone-inputs').phoneInputs({
-            'countriesUrl': 'https://restcountries.eu/rest/v2/all',
-            'multiple': true,
-            'countryCodeAttr': 'alpha2Code',
-            'countryNameAttr': 'name',
-            'countryCallPrefix': 'callingCodes',
-            'limit': 5,
-            'lineTemplate': '#phone-inputs-line-template',
-            'inputName': 'phone',
-            'required': 'true'
-        });
-
-        // listen to form
-        $('#phone-inputs-test-form').on('submit', function (event) {
-            event.preventDefault();
-            $('#serialize-section').JSONView(JSON.stringify($(this).serializeArray()));
-        })
-
-        // Listen to bug
-        $(document).on('phone.inputs.debug', '.phone-inputs', function (event, data) {
-            let alert = $('<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
-            alert.append(`<span>${data.message}</span>`);
-            alert.append('<br>');
-
-            let dataJson = $('<span></span>');
-
-            if (data.data) {
-                dataJson.JSONView(JSON.stringify(data.data));
-                alert.append(dataJson);
-            }
-
-
-            $('#debug-section').append(alert);
-        })
-
-        //Prevent delete
-        $(document).on('phone.inputs.line.delete', '.phone-inputs', function (event, data) {
-            //event.preventDefault();
-            //alert(data.message)
-        })
-    </script>
+    <!-- Demo Script -->
+    <script src="demo.js"></script>
 </body>
 
 </html>
