@@ -21,7 +21,7 @@
             <h2>Phone Inputs</h2>
             <div class="lead">jQuery version</div>
             <p class="lead mt-3">If you do not want to take over the management of phone number forms, this plugin can
-                be useful (if you use jQuery).</p>
+                be useful.</p>
         </div>
 
         <div class="py-3">
@@ -99,7 +99,7 @@
 
         // Listen to bug
         $(document).on('phone.inputs.debug', '.phone-inputs', function (event, data) {
-            let alert = $('<div class="alert alert-success"></div>');
+            let alert = $('<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
             alert.append(`<span>${data.message}</span>`);
             alert.append('<br>');
 

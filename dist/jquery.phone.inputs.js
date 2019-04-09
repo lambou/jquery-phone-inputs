@@ -22,17 +22,18 @@
             debug: 'phone.inputs.debug',
             lineDelete: 'phone.inputs.line.delete',
             changed: 'phone.inputs.changed',
-            lineAdded: 'phone.inputs.line.added'
+            lineAdded: 'phone.inputs.line.added',
+            defaultChoose: 'phone.inputs.default.choose'
         };
 
         let countries = [];
         const self = this;
 
-        function loadCountries() {
+        function loadCountries(rootElement) {
             return $.get(settings.countriesUrl, function (data) {
                 countries = data;
 
-                return self.each(function (index, element) {
+                return rootElement.each(function (index, element) {
                     /**
                      * Phone inputs element
                      */
@@ -42,9 +43,9 @@
                      * Add the first line
                      */
                     if (phoneInputs.find(`.${settings.lineClass}`).length == 0) {
-                        addNewLine(phoneInputs, null);
-                    }else{
-                        if(settings.multiple){
+                        addNewLine(rootElement, phoneInputs, null);
+                    } else {
+                        if (settings.multiple) {
                             console.log('Make sur you have the add button add give the "addLineBtnClass" option.');
                         }
                     }
@@ -58,9 +59,9 @@
                             /**
                              * Add the new input
                              */
-                            addNewLine(phoneInputs, null);
-                        }else{
-                            self.trigger(events.debug, [{
+                            addNewLine(rootElement, phoneInputs, null);
+                        } else {
+                            logEvent(rootElement, events.debug, [{
                                 message: 'multiple option is false. You can\'t add a new input.'
                             }]);
                         }
@@ -69,7 +70,7 @@
                     /**
                      * Listen to delete line call
                      */
-                    $(document).on('click', `.${settings.deleteLineBtnClass}`, function(event){
+                    $(document).on('click', `.${settings.deleteLineBtnClass}`, function (event) {
                         event.preventDefault();
                         const line = $(this).closest(`.${settings.lineClass}`);
                         const inputData = {
@@ -77,12 +78,12 @@
                             default: line.find('input[type="checkbox"]').prop('checked'),
                             number: line.find('input[type="text"]').val()
                         };
-                        
+
                         /**
                          * Trigger event
                          */
                         var lineDeletedEvent = jQuery.Event(events.lineDelete);
-                        self.trigger(lineDeletedEvent, [{
+                        rootElement.trigger(lineDeletedEvent, [{
                             message: 'A phone number field is going to be removed',
                             data: inputData
                         }]);
@@ -90,7 +91,7 @@
                         /**
                          * Debug
                          */
-                        self.trigger(events.debug, [{
+                        logEvent(rootElement, events.debug, [{
                             message: 'A phone number field is going to be removed',
                             data: inputData
                         }]);
@@ -98,12 +99,12 @@
                         /**
                          * If event is not prevented delete the row
                          */
-                        if(!lineDeletedEvent.isDefaultPrevented()){
+                        if (!lineDeletedEvent.isDefaultPrevented()) {
                             line.remove();
                             /**
                              * Trigger event
                              */
-                            self.trigger(events.changed, [{
+                            rootElement.trigger(events.changed, [{
                                 message: 'A phone number field has been removed',
                                 data: inputData
                             }]);
@@ -114,9 +115,9 @@
                             updateInputsIndex(phoneInputs);
 
                             /**
-                             * debug
+                             * Debug
                              */
-                            self.trigger(events.debug, [{
+                            logEvent(rootElement, events.debug, [{
                                 message: 'A phone number field has been removed',
                                 data: inputData
                             }]);
@@ -126,8 +127,11 @@
             });
         }
 
-        loadCountries().fail(function () {
-            self.trigger(events.debug, [{
+        /**
+         * Load countries and initialize the phone inputs field
+         */
+        loadCountries(self).fail(function () {
+            logEvent(self, events.debug, [{
                 message: `Unable to load countries from ${settings.countriesUrl}`
             }]);
         });
@@ -135,7 +139,7 @@
         /**
          * Add a new phone number entry field
          */
-        function addNewLine(phoneInputs, data = null) {
+        function addNewLine(rootElement, phoneInputs, data = null) {
             // Get the line template
             var lineTemplate = $(document).find(settings.lineTemplate).text();
             var template = $(lineTemplate);
@@ -175,8 +179,45 @@
 
                     /** Add change event */
                     template.find('input[type="checkbox"]').change(function (event) {
-                        phoneInputs.find('input[type="checkbox"]').prop('checked', false);
-                        $(this).prop('checked', true);
+                        /**
+                         * Get input values
+                         */
+                        let inputData = {
+                            country: template.find('select').val(),
+                            default: true,
+                            number: template.find('input[type="text"]').val()
+                        };
+
+                        /**
+                         * Trigger event
+                         */
+                        var defaultChooseEvent = jQuery.Event(events.defaultChoose);
+                        rootElement.trigger(defaultChooseEvent, [{
+                            message: 'Choosing a default number',
+                            data: inputData
+                        }]);
+
+                        /**
+                         * Debug
+                         */
+                        logEvent(rootElement, events.debug, [{
+                            message: 'Choosing a default number',
+                            data: inputData
+                        }]);
+
+                        if (!defaultChooseEvent.isDefaultPrevented()) {
+                            phoneInputs.find('input[type="checkbox"]').prop('checked', false);
+                            $(this).prop('checked', true);
+
+                            /**
+                             * Debug
+                             */
+                            logEvent(rootElement, events.debug, [{
+                                message: 'Default number choosed',
+                                data: inputData
+                            }]);
+
+                        }
                     });
                 } else {
                     /**
@@ -248,21 +289,21 @@
                 /**
                  * Trigger lineAdded event
                  */
-                self.trigger(events.lineAdded, [{
+                rootElement.trigger(events.lineAdded, [{
                     message: `A new phone number entry field has been added.`
                 }]);
 
                 /**
                  * Debug
                  */
-                self.trigger(events.debug, [{
+                logEvent(rootElement, events.debug, [{
                     message: `A new phone number entry field has been added.`
                 }]);
             } else {
                 /**
                  * Debug
                  */
-                self.trigger(events.debug, [{
+                logEvent(rootElement, events.debug, [{
                     message: `The limit of phone number inputs (${settings.limit}) have been reached.`
                 }]);
             }
@@ -271,13 +312,20 @@
         /**
          * Update inputs index
          */
-        function updateInputsIndex(phoneInputs){
-            phoneInputs.find(`.${settings.lineClass}`).each(function(index, element){
+        function updateInputsIndex(phoneInputs) {
+            phoneInputs.find(`.${settings.lineClass}`).each(function (index, element) {
                 const line = $(element);
                 line.find('select').attr('name', `${settings.inputName}[${index}][country]`);
                 line.find('input[type="text"]').attr('name', `${settings.inputName}[${index}][number]`);
                 line.find('input[type="checkbox"]').attr('name', `${settings.inputName}[${index}][default]`);
             });
+        }
+
+        /**
+         * Log debug event
+         */
+        function logEvent(rootElement, event, data){
+            rootElement.trigger(event, data);
         }
     };
 }(jQuery, document));
