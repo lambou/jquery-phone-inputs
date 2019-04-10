@@ -32,6 +32,8 @@
                 <div class="col-md-6">
                     <div class="lead font-weight-bold">Example</div>
                     <form id="phone-inputs-test-form" class="py-3" method="post">
+                        <div class="phone-inputs" data-form-name="phone"></div>
+
                         <div class="phone-inputs"></div>
                         <br>
                         <button type="submit" class="btn btn-success">Submit</button>
@@ -41,6 +43,8 @@
                         <div class="lead mt-2">Debug console</div>
                         <small class="mb-5">Listen to <b>phone.inputs.debug</b> event:
                             <code>$('.phone-inputs').on('phone.inputs.debug', function(event, data){});</code></small>
+                            <br>
+                            <button type="button" class="btn btn-secondary btn-sm mt-2 clear-debug"><i class="fa fa-trash"></i>Clear</button>
                         <hr>
                     </section>
                 </div>

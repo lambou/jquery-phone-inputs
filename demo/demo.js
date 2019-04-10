@@ -2,6 +2,7 @@
 
     $('.phone-inputs').phoneInputs({
         'countriesUrl': 'https://restcountries.eu/rest/v2/all',
+        'defaultCountry': 'CM',
         'multiple': true,
         'countryCodeAttr': 'alpha2Code',
         'countryNameAttr': 'name',
@@ -9,7 +10,7 @@
         'limit': 5,
         'lineTemplate': '#phone-inputs-line-template',
         'inputName': 'phone',
-        'required': true
+        'required': false
     });
 
     // listen to form
@@ -33,6 +34,14 @@
 
 
         $('#debug-section').append(alert);
+    })
+
+    /**
+     * Clear debug section
+     */
+    $(document).on('click', '.clear-debug', function(event){
+        event.preventDefault();
+        $(document).find('#debug-section').find('.alert').remove();
     })
 
     //Prevent delete

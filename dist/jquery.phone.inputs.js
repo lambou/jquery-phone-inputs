@@ -12,6 +12,7 @@
             limit: 1,
             lineTemplate: '#phone-inputs-line-template',
             inputName: 'phone',
+            inputNameAttr: 'data-form-name',
             addLineBtnClass: "btn-phone-inputs-add-line",
             deleteLineBtnClass: "btn-phone-inputs-delete-line",
             checkboxInputSectionClass: "phone-inputs-default-checkbox-section",
@@ -22,7 +23,7 @@
         var events = {
             debug: 'phone.inputs.debug',
             lineDelete: 'phone.inputs.line.delete',
-            changed: 'phone.inputs.changed',
+            change: 'phone.inputs.change',
             lineAdded: 'phone.inputs.line.added',
             defaultChoose: 'phone.inputs.default.choose'
         };
@@ -39,6 +40,17 @@
                      * Phone inputs element
                      */
                     var phoneInputs = $(element);
+
+                    /**
+                     * Check form data name
+                     */
+                    if(!phoneInputs.attr('data-form-name')){
+                        if(rootElement.length > 1){
+                            phoneInputs.attr('data-form-name', `phone_${index}`);
+                        }else{
+                            phoneInputs.attr('data-form-name', settings.inputName);
+                        }
+                    }
 
                     /**
                      * Add the first line
@@ -60,7 +72,7 @@
                             /**
                              * Add the new input
                              */
-                            addNewLine(rootElement, phoneInputs, null);
+                            addNewLine(rootElement, $(this).closest(phoneInputs), null);
                         } else {
                             logEvent(rootElement, events.debug, [{
                                 message: 'multiple option is false. You can\'t add a new input.'
@@ -84,7 +96,7 @@
                          * Trigger event
                          */
                         var lineDeletedEvent = jQuery.Event(events.lineDelete);
-                        rootElement.trigger(lineDeletedEvent, [{
+                        triggerEvent(rootElement, lineDeletedEvent, [{
                             message: 'A phone number field is going to be removed',
                             data: inputData
                         }]);
@@ -105,7 +117,7 @@
                             /**
                              * Trigger event
                              */
-                            rootElement.trigger(events.changed, [{
+                            triggerEvent(rootElement, events.change, [{
                                 message: 'A phone number field has been removed',
                                 data: inputData
                             }]);
@@ -174,9 +186,9 @@
                     /**
                      * Give name to field
                      */
-                    template.find('select').attr('name', `${settings.inputName}[${phoneInputs.find(`.${settings.lineClass}`).length}][country]`);
-                    template.find('input[type="text"]').attr('name', `${settings.inputName}[${phoneInputs.find(`.${settings.lineClass}`).length}][number]`);
-                    template.find('input[type="checkbox"]').attr('name', `${settings.inputName}[${phoneInputs.find(`.${settings.lineClass}`).length}][default]`);
+                    template.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][country]`);
+                    template.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][number]`);
+                    template.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][default]`);
 
                     /** Add change event */
                     template.find('input[type="checkbox"]').change(function (event) {
@@ -193,7 +205,7 @@
                          * Trigger event
                          */
                         var defaultChooseEvent = jQuery.Event(events.defaultChoose);
-                        rootElement.trigger(defaultChooseEvent, [{
+                        triggerEvent(rootElement, defaultChooseEvent, [{
                             message: 'Choosing a default number',
                             data: inputData
                         }]);
@@ -209,6 +221,15 @@
                         if (!defaultChooseEvent.isDefaultPrevented()) {
                             phoneInputs.find('input[type="checkbox"]').prop('checked', false);
                             $(this).prop('checked', true);
+
+                            /**
+                             * Trigger change event
+                             */
+                            triggerEvent(rootElement, events.change, [{
+                                message: 'Default number choosed',
+                                data: inputData
+                            }]);
+                            
 
                             /**
                              * Debug
@@ -247,9 +268,9 @@
                     /**
                      * Give name to field
                      */
-                    template.find('select').attr('name', `${settings.inputName}[country]`);
-                    template.find('input[type="text"]').attr('name', `${settings.inputName}[number]`);
-                    template.find('input[type="checkbox"]').attr('name', `${settings.inputName}[default]`);
+                    template.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[country]`);
+                    template.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[number]`);
+                    template.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[default]`);
                 }
 
                 if (data != null) {
@@ -276,9 +297,21 @@
 
                 countries.forEach(country => {
                     var option = $(`<option value="${country[settings.countryCodeAttr]}">${country[settings.countryNameAttr]} (+${country[settings.countryCallPrefix]})</option>`);
-                    if (data != null && country[settings.countryCodeAttr] == data.country) {
-                        option.prop('selected', true);
-                    }else if(settings.defaultCountry != null && country[settings.countryCodeAttr] == settings.defaultCountry){
+                    if (data != null) {
+                        if(data.coutry != null){
+                            if(country[settings.countryCodeAttr].toLowerCase() == data.country.toLowerCase()){
+                                option.prop('selected', true);
+                            }
+                        }else{
+                            /**
+                             * Debug
+                             */
+                            logEvent(rootElement, event.debug, [{
+                                message: 'The country attribute cannot be null.',
+                                data: data
+                            }]);
+                        }
+                    }else if(settings.defaultCountry != null && country[settings.countryCodeAttr].toLowerCase() == settings.defaultCountry.toLowerCase()){
                         option.prop('selected', true);
                     }
                     template.find('select').append(option);
@@ -292,8 +325,15 @@
                 /**
                  * Trigger lineAdded event
                  */
-                rootElement.trigger(events.lineAdded, [{
+                triggerEvent(rootElement, events.lineAdded, [{
                     message: `A new phone number entry field has been added.`
+                }]);
+
+                /**
+                 * Trigger change event
+                 */
+                triggerEvent(rootElement, events.change, [{
+                    message: 'A new phone number entry field has been added.'
                 }]);
 
                 /**
@@ -318,9 +358,9 @@
         function updateInputsIndex(phoneInputs) {
             phoneInputs.find(`.${settings.lineClass}`).each(function (index, element) {
                 const line = $(element);
-                line.find('select').attr('name', `${settings.inputName}[${index}][country]`);
-                line.find('input[type="text"]').attr('name', `${settings.inputName}[${index}][number]`);
-                line.find('input[type="checkbox"]').attr('name', `${settings.inputName}[${index}][default]`);
+                line.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][country]`);
+                line.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][number]`);
+                line.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][default]`);
             });
         }
 
@@ -328,6 +368,13 @@
          * Log debug event
          */
         function logEvent(rootElement, event, data){
+            rootElement.trigger(event, data);
+        }
+
+        /**
+         * Trigger event
+         */
+        function triggerEvent(rootElement, event, data){
             rootElement.trigger(event, data);
         }
     };
