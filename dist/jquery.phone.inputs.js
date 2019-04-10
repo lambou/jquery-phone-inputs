@@ -5,6 +5,7 @@
             // These are the defaults.
             countriesUrl: 'https://restcountries.eu/rest/v2/all',
             multiple: true,
+            defaultCountry: null,
             countryCodeAttr: 'alpha2Code',
             countryNameAttr: 'name',
             countryCallPrefix: 'callingCodes',
@@ -276,6 +277,8 @@
                 countries.forEach(country => {
                     var option = $(`<option value="${country[settings.countryCodeAttr]}">${country[settings.countryNameAttr]} (+${country[settings.countryCallPrefix]})</option>`);
                     if (data != null && country[settings.countryCodeAttr] == data.country) {
+                        option.prop('selected', true);
+                    }else if(settings.defaultCountry != null && country[settings.countryCodeAttr] == settings.defaultCountry){
                         option.prop('selected', true);
                     }
                     template.find('select').append(option);

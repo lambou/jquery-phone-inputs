@@ -1,5 +1,4 @@
 (function ($, document) {
-    hljs.initHighlightingOnLoad();
 
     $('.phone-inputs').phoneInputs({
         'countriesUrl': 'https://restcountries.eu/rest/v2/all',
