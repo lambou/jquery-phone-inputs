@@ -32,9 +32,11 @@
                 <div class="col-md-6">
                     <div class="lead font-weight-bold">Example</div>
                     <form id="phone-inputs-test-form" class="py-3" method="post">
-                        <div class="phone-inputs" data-form-name="phone"></div>
-
-                        <div class="phone-inputs"></div>
+                        <label for="company">Company phones (<code>required</code>)</label>
+                        <div id="company" class="phone-inputs" data-form-name="company_phones" required></div>
+                        <br>
+                        <label for="personal">Personal phones (<code>optional</code>)</label>
+                        <div id="personal" class="phone-inputs" data-form-name="personal_phones"></div>
                         <br>
                         <button type="submit" class="btn btn-success">Submit</button>
                     </form>

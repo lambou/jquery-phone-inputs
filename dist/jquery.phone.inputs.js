@@ -282,7 +282,7 @@
                  * Check required property
                  * :) Not sure that required option will always be a boolean value so...
                  */
-                if (settings.required) {
+                if (settings.required || phoneInputs.attr('required')) {
                     template.find('select').prop('required', true);
                     template.find('input[type="text"]').prop('required', true);
                 } else {
