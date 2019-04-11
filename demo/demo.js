@@ -2,15 +2,9 @@
 
     $('.phone-inputs').phoneInputs({
         'countriesUrl': 'https://restcountries.eu/rest/v2/all',
-        'defaultCountry': 'CM',
         'multiple': true,
-        'countryCodeAttr': 'alpha2Code',
-        'countryNameAttr': 'name',
-        'countryCallPrefix': 'callingCodes',
         'limit': 5,
-        'lineTemplate': '#phone-inputs-line-template',
-        'inputName': 'phone',
-        'required': false
+        'lineTemplate': '#phone-inputs-line-template'
     });
 
     // listen to form
