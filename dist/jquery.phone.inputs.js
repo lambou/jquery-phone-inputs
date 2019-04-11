@@ -12,7 +12,13 @@
             limit: 1,
             lineTemplate: '#phone-inputs-line-template',
             inputName: 'phone',
+            inputCountryName: 'country',
+            inputNumberName: 'number',
+            inputDefaultName: 'default',
             inputNameAttr: 'data-form-name',
+            inputCountryNameAttr: 'data-form-country-name',
+            inputNumberNameAttr: 'data-form-number-name',
+            inputDefaultNameAttr: 'data-form-default-name',
             addLineBtnClass: "btn-phone-inputs-add-line",
             deleteLineBtnClass: "btn-phone-inputs-delete-line",
             checkboxInputSectionClass: "phone-inputs-default-checkbox-section",
@@ -46,11 +52,33 @@
                      */
                     if(!phoneInputs.attr('data-form-name')){
                         if(rootElement.length > 1){
-                            phoneInputs.attr('data-form-name', `phone_${index}`);
+                            phoneInputs.attr(settings.inputNameAttr, `phone_${index}`);
                         }else{
-                            phoneInputs.attr('data-form-name', settings.inputName);
+                            phoneInputs.attr(settings.inputNameAttr, settings.inputName);
                         }
                     }
+
+                    /**
+                     * Check form data country name
+                     */
+                    if(!phoneInputs.attr(settings.inputCountryNameAttr)){
+                        phoneInputs.attr(settings.inputCountryNameAttr, settings.inputCountryName);
+                    }
+
+                    /**
+                     * Check form data number name
+                     */
+                    if(!phoneInputs.attr(settings.inputNumberNameAttr)){
+                        phoneInputs.attr(settings.inputNumberNameAttr, settings.inputNumberName);
+                    }
+
+                    /**
+                     * Check form data default name
+                     */
+                    if(!phoneInputs.attr(settings.inputDefaultNameAttr)){
+                        phoneInputs.attr(settings.inputDefaultNameAttr, settings.inputDefaultName);
+                    }
+
 
                     /**
                      * Add the first line
@@ -186,9 +214,9 @@
                     /**
                      * Give name to field
                      */
-                    template.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][country]`);
-                    template.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][number]`);
-                    template.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][default]`);
+                    template.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][${phoneInputs.attr(settings.inputCountryNameAttr)}]`);
+                    template.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][${phoneInputs.attr(settings.inputNumberNameAttr)}]`);
+                    template.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.find(`.${settings.lineClass}`).length}][${phoneInputs.attr(settings.inputDefaultNameAttr)}]`);
 
                     /** Add change event */
                     template.find('input[type="checkbox"]').change(function (event) {
@@ -268,9 +296,9 @@
                     /**
                      * Give name to field
                      */
-                    template.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[country]`);
-                    template.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[number]`);
-                    template.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[default]`);
+                    template.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.attr(settings.inputCountryNameAttr)}]`);
+                    template.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.attr(settings.inputNumberNameAttr)}]`);
+                    template.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${phoneInputs.attr(settings.inputDefaultNameAttr)}]`);
                 }
 
                 if (data != null) {
@@ -358,9 +386,9 @@
         function updateInputsIndex(phoneInputs) {
             phoneInputs.find(`.${settings.lineClass}`).each(function (index, element) {
                 const line = $(element);
-                line.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][country]`);
-                line.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][number]`);
-                line.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][default]`);
+                line.find('select').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][${phoneInputs.attr(settings.inputCountryNameAttr)}]`);
+                line.find('input[type="text"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][${phoneInputs.attr(settings.inputNumberNameAttr)}]`);
+                line.find('input[type="checkbox"]').attr('name', `${phoneInputs.attr(settings.inputNameAttr)}[${index}][${phoneInputs.attr(settings.inputDefaultNameAttr)}]`);
             });
         }
 
