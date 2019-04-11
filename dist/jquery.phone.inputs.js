@@ -11,6 +11,10 @@
             countryCallPrefix: 'callingCodes',
             limit: 1,
             lineTemplate: '#phone-inputs-line-template',
+            lineErrorTemplate: '#phone-inputs-line-error-template',
+            lineClass: 'phone-inputs-line',
+            invalidClass: 'is-invalid',
+            invalidMessageClass: 'invalid-feedback',
             inputName: 'phone',
             inputCountryName: 'country',
             inputNumberName: 'number',
@@ -19,10 +23,11 @@
             inputCountryNameAttr: 'data-form-country-name',
             inputNumberNameAttr: 'data-form-number-name',
             inputDefaultNameAttr: 'data-form-default-name',
+            dataAttr: 'data',
+            dataErrorsAttr: 'data-errors',
             addLineBtnClass: "btn-phone-inputs-add-line",
             deleteLineBtnClass: "btn-phone-inputs-delete-line",
             checkboxInputSectionClass: "phone-inputs-default-checkbox-section",
-            lineClass: 'phone-inputs-line',
             required: false
         }, options);
 
@@ -83,13 +88,34 @@
                     /**
                      * Add the first line
                      */
-                    if (phoneInputs.find(`.${settings.lineClass}`).length == 0) {
-                        addNewLine(rootElement, phoneInputs, null);
-                    } else {
-                        if (settings.multiple) {
-                            console.log('Make sur you have the add button add give the "addLineBtnClass" option.');
+
+                    try {
+                        var defaultPhoneNumbers = JSON.parse(phoneInputs.attr(settings.dataAttr));
+                        if(Array.isArray(defaultPhoneNumbers)){
+                            defaultPhoneNumbers.forEach(phoneNumber => {
+                                addNewLine(rootElement, phoneInputs, phoneNumber);
+                            });
+                        }else{
+                            addNewLine(rootElement, phoneInputs, defaultPhoneNumbers);
                         }
+                    } catch (error) {
+                        /**
+                         * Add the firt language
+                         */
+                        addNewLine(rootElement, phoneInputs, null);
                     }
+
+                    /**
+                     * Find current phone number and select the first if it not exist
+                     */
+                    if(phoneInputs.find('input[type="checkbox"]:checked').length == 0){
+                        phoneInputs.find('input[type="checkbox"]').first().prop('checked', true);
+                    }
+
+                    /**
+                     * Diplay errors
+                     */
+                    displayErrors(rootElement, phoneInputs);
 
                     /**
                      * Listen to the new line call
@@ -197,11 +223,6 @@
                         template.find(`.${settings.deleteLineBtnClass}`).css({
                             'display': 'none'
                         });
-
-                        /**
-                         * Set the line as the default phone number
-                         */
-                        template.find('input[type="checkbox"]').prop('checked', true);
                     } else {
                         /**
                          * Hide add line button input
@@ -302,8 +323,8 @@
                 }
 
                 if (data != null) {
-                    template.find('input[type="text"]').val(data.number);
-                    template.find('input[type="checkbox"]').prop('checked', data.default);
+                    template.find('input[type="text"]').val(data[`${phoneInputs.attr(settings.inputNumberNameAttr)}`]);
+                    template.find('input[type="checkbox"]').prop('checked', data[`${phoneInputs.attr(settings.inputDefaultNameAttr)}`]);
                 }
 
                 /**
@@ -326,8 +347,8 @@
                 countries.forEach(country => {
                     var option = $(`<option value="${country[settings.countryCodeAttr]}">${country[settings.countryNameAttr]} (+${country[settings.countryCallPrefix]})</option>`);
                     if (data != null) {
-                        if(data.coutry != null){
-                            if(country[settings.countryCodeAttr].toLowerCase() == data.country.toLowerCase()){
+                        if(data[`${phoneInputs.attr(settings.inputCountryNameAttr)}`] != null){
+                            if(country[settings.countryCodeAttr].toLowerCase() == data[`${phoneInputs.attr(settings.inputCountryNameAttr)}`].toLowerCase()){
                                 option.prop('selected', true);
                             }
                         }else{
@@ -404,6 +425,52 @@
          */
         function triggerEvent(rootElement, event, data){
             rootElement.trigger(event, data);
+        }
+
+        /**
+         * Display error under line when exist
+         * @param {*} phoneInputs 
+         * @param {*} errors 
+         */
+        function displayErrors(rootElement, phoneInputs){
+            phoneInputs.find(`.${settings.lineClass}`).each(function(index, element){
+                try {
+                    var errors = JSON.parse(phoneInputs.attr(settings.dataErrorsAttr));
+                    var errorItem = errors[`${phoneInputs.attr(settings.inputNameAttr)}.${index}.${phoneInputs.attr(settings.inputNumberNameAttr)}`];
+                    if(errorItem){
+                        var errorTemplate = $(document).find(settings.lineErrorTemplate).text();
+                        if(Array.isArray(errorItem)){
+                            errorTemplate = errorTemplate.replace(new RegExp('%%error%%', 'gi'), errorItem[0]);
+                        }else{
+                            errorTemplate = errorTemplate.replace(new RegExp('%%error%%', 'gi'), errorItem);
+                        }
+
+                        var errorRender = $(errorTemplate);
+                        /**
+                         * Add Error class
+                         */
+                        $(element).addClass(settings.invalidClass);
+                        errorRender.find(`.${settings.invalidMessageClass}`).parent().addClass(settings.invalidClass);
+
+                        /**
+                         * Add Error
+                         */
+                        $(element).append(errorRender); 
+                        
+                        /**
+                         * Force Error display
+                         */
+                        if(!errorRender.find(`.${settings.invalidMessageClass}`).is(':visible')){
+                            errorRender.find(`.${settings.invalidMessageClass}`).fadeIn('slow');
+                        }
+                    }
+                } catch (error) {
+                    logEvent(rootElement, events.debug, [{
+                        message: 'Unable to display errors',
+                        data: error
+                    }]);
+                }
+            })
         }
     };
 }(jQuery, document));
