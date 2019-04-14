@@ -24,7 +24,7 @@
             inputNumberNameAttr: 'data-form-number-name',
             inputDefaultNameAttr: 'data-form-default-name',
             dataAttr: 'data',
-            dataErrorsAttr: 'data-errors',
+            dataErrorsttr: 'data-errors',
             addLineBtnClass: "btn-phone-inputs-add-line",
             deleteLineBtnClass: "btn-phone-inputs-delete-line",
             checkboxInputSectionClass: "phone-inputs-default-checkbox-section",
@@ -91,7 +91,7 @@
 
                     try {
                         var defaultPhoneNumbers = JSON.parse(phoneInputs.attr(settings.dataAttr));
-                        if(Array.isArray(defaultPhoneNumbers)){
+                        if(Array.isArray(defaultPhoneNumbers) && defaultPhoneNumbers.length != 0){
                             defaultPhoneNumbers.forEach(phoneNumber => {
                                 addNewLine(rootElement, phoneInputs, phoneNumber);
                             });
@@ -435,7 +435,7 @@
         function displayErrors(rootElement, phoneInputs){
             phoneInputs.find(`.${settings.lineClass}`).each(function(index, element){
                 try {
-                    var errors = JSON.parse(phoneInputs.attr(settings.dataErrorsAttr));
+                    var errors = JSON.parse(phoneInputs.attr(settings.dataErrorsttr));
                     var errorItem = errors[`${phoneInputs.attr(settings.inputNameAttr)}.${index}.${phoneInputs.attr(settings.inputNumberNameAttr)}`];
                     if(errorItem){
                         var errorTemplate = $(document).find(settings.lineErrorTemplate).text();
